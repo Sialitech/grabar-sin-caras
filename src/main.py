@@ -257,4 +257,3 @@ if __name__ == "__main__":
     
     # Iniciar grabación
     recorder.record()
-    print("Hello World")
