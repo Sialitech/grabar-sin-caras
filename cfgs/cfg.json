@@ -6,21 +6,31 @@
                 {
                     "id": 1,
                     "name": "cam1",
-                    "url": "002.MP4",
+                    "url": "rtsp://admin:acciona-2024@192.168.0.3:554",
                     "offset_tracking": 0,
-                    "models": ["yolov8n-pose.pt" ],
-                    "roi": [[430,840], [466,315], [678, 252], [421, 164], [1008, 209], [1261, 348], [1752, 767], [959, 982], [1190, 93], [134, 441]],
-                    "target": [[-6, 62], [-3, 21], [3, 18], [0, 0], [18, 16], [17, 38], [12, 64.5], [-0.5, 67], [38, -13], [-13, 34]]
+                    "models": ["yolov8n-pose.pt" ]
                 },
                 {
                     "id": 2,
                     "name": "cam2",
-                    "url": "001.MP4",
+                    "url": "rtsp://admin:Dixie_bicep8@192.168.1.6:554",
                     "offset_tracking": 0,
-                    "models": ["yolov8n-pose.pt"],
-                    "roi": [[430,840], [466,315], [678, 252], [421, 164], [1008, 209], [1261, 348], [1752, 767], [959, 982], [1190, 93], [134, 441]],
-                    "target": [[-6, 62], [-3, 21], [3, 18], [0, 0], [18, 16], [17, 38], [12, 64.5], [-0.5, 67], [38, -13], [-13, 34]]
+                    "models": ["yolov8n-pose.pt"]
 
+                },
+                {
+                    "id": 1,
+                    "name": "cam3",
+                    "url": "rtsp://admin:Dixie_bicep8@192.168.1.18:554",
+                    "offset_tracking": 0,
+                    "models": ["yolov8n-pose.pt" ]
+                },
+                {
+                    "id": 1,
+                    "name": "cam4",
+                    "url": "rtsp://admin:acciona-2024@192.168.0.46:554",
+                    "offset_tracking": 0,
+                    "models": ["yolov8n-pose.pt" ]
                 }
             ],
     "tracker_config": {
