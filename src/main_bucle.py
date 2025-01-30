@@ -22,7 +22,7 @@ class VideoRecorder:
             video_duration_minutes (int): Duración de cada video en minutos
         """
         self.model = Model("http://api-yolo:3002", cfg_path)
-        self.video_duration = video_duration_minutes * 60  # Convertir minutos a segundos
+        self.video_duration = video_duration_minutes # * 60  # Convertir minutos a segundos
         self.cfg_path = cfg_path
         self.writers = {}
         self.frame_counts = {}
@@ -70,7 +70,7 @@ class VideoRecorder:
             output_path = self.current_output_dir / f"{camera_name}.mp4"
             self.writers[camera_name] = cv2.VideoWriter(
                 str(output_path),
-                cv2.VideoWriter_fourcc(*'avc1'),  # Cambiado a avc1 para mejor compatibilidad
+                cv2.VideoWriter_fourcc(*'mp4v'),  # Codec compatible con MP4
                 fps,
                 (width, height)
             )
@@ -101,16 +101,14 @@ class VideoRecorder:
             # Inicializar video writers
             self.initialize_video_writers(first_frames)
             
-            # Escribir los primeros frames
-            for camera_name, frame_data in first_frames.items():
-                self.write_frame(camera_name, frame_data)
-            
             # Loop de grabación por la duración especificada
             while time.time() - self.start_time < self.video_duration:
                 for camera in self.cfg['cameras']:
                     camera_name = camera['name']
                     try:
                         frame_data = self.model.get_image(camera_name, processed=False)
+                        if camera_name == 'cam4':
+                            cv2.imshow(frame_data)
                         self.write_frame(camera_name, frame_data)
                     except Exception as e:
                         logger.error(f"Error al obtener frame de {camera_name}: {e}")
@@ -133,23 +131,7 @@ class VideoRecorder:
             logger.error(f"Error decodificando frame para {camera_name}")
             return
             
-        # Obtener FPS actuales de la API
-        current_fps = self.get_camera_fps(camera_name)
-        
-        # Si los FPS han cambiado significativamente, crear un nuevo writer
-        if abs(current_fps - self.camera_fps[camera_name]) > 1:  # Umbral de cambio de 1 FPS
-            height, width = frame.shape[:2]
-            output_path = self.current_output_dir / f"{camera_name}_{self.frame_counts[camera_name]}.mp4"
-            self.writers[camera_name].release()
-            self.writers[camera_name] = cv2.VideoWriter(
-                str(output_path),
-                cv2.VideoWriter_fourcc(*'avc1'),
-                current_fps,
-                (width, height)
-            )
-            self.camera_fps[camera_name] = current_fps
-            logger.info(f"Ajustando FPS para {camera_name} a {current_fps:.2f}")
-        
+        # Escribir el frame directamente
         self.writers[camera_name].write(frame)
         self.frame_counts[camera_name] += 1
         
