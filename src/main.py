@@ -120,7 +120,8 @@ class VideoRecorder:
                 "ffmpeg", "-i", str(video_path), "-filter:v", f"fps=fps={target_fps}",
                 "-c:a", "copy", temp_path
             ]
-            subprocess.run(command, check=True)
+            # Redirigir la salida a DEVNULL para suprimir los mensajes
+            subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             os.replace(temp_path, video_path)
             print(f"Video de {video_path} ajustado a {target_fps:.2f} FPS.")
         except subprocess.CalledProcessError as e:
