@@ -73,7 +73,7 @@ class VideoRecorder:
                         print(f"{camera_name}: Tiempo límite alcanzado ({elapsed_time:.2f}s). Deteniendo grabación.")
                         break
 
-                    for chunk in response.iter_content(chunk_size=8192):
+                    for chunk in response.iter_content(chunk_size=16384):
                         if self.stop_event.is_set():
                             break
                         
@@ -98,6 +98,7 @@ class VideoRecorder:
                                         print(f"{camera_name}: {frame_count} frames capturados")
 
                 writer.release()
+                os.chmod(output_path, 0o777) 
                 print(f"Finalizada grabación de {camera_name}, total frames: {frame_count}")
                 average_fps = frame_count / (time.time() - start_time)
                 logger.info(f"{camera_name}: Grabación finalizada. FPS promedio: {average_fps:.2f}")
@@ -137,6 +138,7 @@ class VideoRecorder:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             self.current_output_dir = Path("../files") / timestamp
             self.current_output_dir.mkdir(parents=True, exist_ok=True)
+            os.chmod(self.current_output_dir, 0o777)
 
             self.stop_event.clear()
 

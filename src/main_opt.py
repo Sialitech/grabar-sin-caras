@@ -69,7 +69,7 @@ class OptimizedVideoRecorder:
             start_time = time.time()
             writer = None
 
-            for chunk in response.iter_content(chunk_size=8192):
+            for chunk in response.iter_content(chunk_size=16384):
                 if self.stop_event:
                     break
 
@@ -110,6 +110,7 @@ class OptimizedVideoRecorder:
 
             if writer:
                 writer.release()
+                os.chmod(video_path, 0o777) 
 
             average_fps = frame_count / (time.time() - start_time)
             logger.info(f"{camera_name}: Grabación finalizada. FPS promedio: {average_fps:.2f}")
@@ -144,6 +145,7 @@ class OptimizedVideoRecorder:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_dir = Path("../files") / timestamp
         output_dir.mkdir(parents=True, exist_ok=True)
+        os.chmod(output_dir, 0o777)
 
         logger.info("Iniciando grabación para todas las cámaras...")
 
