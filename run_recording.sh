@@ -35,7 +35,7 @@ echo -e "${YELLOW}También puedes presionar Ctrl+C para detener manualmente${NC}
 # Esperar a que aparezca el mensaje de finalización en los logs
 docker-compose logs -f main | while read line; do
     echo "$line"
-    if [[ $line == *"Video de"*"finalizado con"* ]]; then
+    if [[ $line == *"Ejecución finalizada"* ]]; then
         echo -e "\n${GREEN}Grabación completada exitosamente.${NC}"
         cleanup
         break
