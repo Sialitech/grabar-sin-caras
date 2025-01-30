@@ -98,7 +98,10 @@ class VideoRecorder:
                                         print(f"{camera_name}: {frame_count} frames capturados")
 
                 writer.release()
-                os.chmod(output_path, 0o777) 
+                try: 
+                    os.chmod(output_path, 0o777) 
+                except Exception as e:
+                    logger.error(f"Error al cambiar permisos del video {output_path}: {e}")
                 print(f"Finalizada grabación de {camera_name}, total frames: {frame_count}")
                 average_fps = frame_count / (time.time() - start_time)
                 logger.info(f"{camera_name}: Grabación finalizada. FPS promedio: {average_fps:.2f}")
@@ -124,6 +127,10 @@ class VideoRecorder:
             # Redirigir la salida a DEVNULL para suprimir los mensajes
             subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             os.replace(temp_path, video_path)
+            try: 
+                os.chmod(video_path, 0o777) 
+            except Exception as e:
+                logger.error(f"Error al cambiar permisos del video {video_path}: {e}")
             print(f"Video de {video_path} ajustado a {target_fps:.2f} FPS.")
         except subprocess.CalledProcessError as e:
             logger.error(f"Error al ajustar FPS del video {video_path}: {e}")
