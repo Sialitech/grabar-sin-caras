@@ -8,6 +8,9 @@ import logging
 from pathlib import Path
 import requests
 from concurrent.futures import ThreadPoolExecutor
+import subprocess
+from requests.exceptions import ChunkedEncodingError
+from model import Model  # Asegúrate de importar el modelo
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +39,14 @@ class OptimizedVideoRecorder:
         if "cameras" not in self.cfg or not isinstance(self.cfg["cameras"], list):
             raise ValueError("La configuración debe contener una lista de cámaras bajo la clave 'cameras'.")
 
+        # Inicializar el modelo
+        self.model = Model("http://api-yolo:3002", cfg_path)
+
+    def load_cameras_and_models(self):
+        logger.info("Cargando cámaras y modelos...")
+        self.model.load_cameras_and_models()
+        self.model.start_process()
+
     def record_camera(self, camera_name, output_dir):
         """
         Graba el video de una cámara específica y guarda directamente al archivo.
@@ -46,9 +57,8 @@ class OptimizedVideoRecorder:
         """
         logger.info(f"Iniciando grabación para la cámara: {camera_name}")
         try:
-            # Configuración inicial del video writer
             video_path = output_dir / f"{camera_name}.mp4"
-            url = f"http://api-yolo:3002/stream"
+            url = f"{self.model.uri}/stream"
             params = {"camera_name": camera_name, "processed": False}
 
             response = requests.get(url, params=params, stream=True, timeout=10)
@@ -60,7 +70,11 @@ class OptimizedVideoRecorder:
             writer = None
 
             for chunk in response.iter_content(chunk_size=8192):
-                if self.stop_event or not chunk:
+                if self.stop_event:
+                    break
+
+                if not chunk:
+                    logger.error(f"Error: Chunk vacío recibido para la cámara {camera_name}.")
                     break
 
                 buffer += chunk
@@ -89,18 +103,44 @@ class OptimizedVideoRecorder:
                             if frame_count % 30 == 0:
                                 logger.info(f"{camera_name}: {frame_count} frames capturados.")
 
+                elapsed_time = time.time() - start_time
+                if elapsed_time >= self.video_duration:
+                    logger.info(f"{camera_name}: Tiempo límite alcanzado ({elapsed_time:.2f}s). Deteniendo grabación.")
+                    break
+
             if writer:
                 writer.release()
 
-            elapsed_time = time.time() - start_time
-            logger.info(f"{camera_name}: Grabación finalizada ({frame_count} frames, duración: {elapsed_time:.2f}s).")
+            average_fps = frame_count / (time.time() - start_time)
+            logger.info(f"{camera_name}: Grabación finalizada. FPS promedio: {average_fps:.2f}")
+
+            self.adjust_video_fps(video_path, average_fps)
+
+        except ChunkedEncodingError as e:
+            logger.error(f"Error de codificación de chunk en la cámara {camera_name}: {e}")
         except Exception as e:
             logger.error(f"Error en la grabación de la cámara {camera_name}: {e}")
+
+    def adjust_video_fps(self, video_path, target_fps):
+        try:
+            temp_path = str(video_path).replace(".mp4", "_temp.mp4")
+            command = [
+                "ffmpeg", "-i", str(video_path), "-filter:v", f"fps=fps={target_fps}",
+                "-c:a", "copy", temp_path
+            ]
+            # Redirigir la salida a DEVNULL para suprimir los mensajes
+            subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            os.replace(temp_path, video_path)
+            logger.info(f"Video de {video_path} ajustado a {target_fps:.2f} FPS.")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error al ajustar FPS del video {video_path}: {e}")
 
     def record_all(self):
         """
         Graba videos de todas las cámaras simultáneamente utilizando hilos.
         """
+        self.load_cameras_and_models()
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_dir = Path("../files") / timestamp
         output_dir.mkdir(parents=True, exist_ok=True)
