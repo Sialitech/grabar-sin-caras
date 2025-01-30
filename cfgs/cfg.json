@@ -1,0 +1,48 @@
+{
+    "models": [
+            "yolov8n-pose.pt"
+            ],
+    "cameras": [
+                {
+                    "id": 1,
+                    "name": "cam1",
+                    "url": "rtsp://admin:acciona-2024@192.168.0.3:554",
+                    "offset_tracking": 0,
+                    "models": ["yolov8n-pose.pt" ]
+                },
+                {
+                    "id": 2,
+                    "name": "cam2",
+                    "url": "rtsp://admin:Dixie_bicep8@192.168.1.6:554",
+                    "offset_tracking": 0,
+                    "models": ["yolov8n-pose.pt"]
+
+                },
+                {
+                    "id": 1,
+                    "name": "cam3",
+                    "url": "rtsp://admin:Dixie_bicep8@192.168.1.18:554",
+                    "offset_tracking": 0,
+                    "models": ["yolov8n-pose.pt" ]
+                },
+                {
+                    "id": 1,
+                    "name": "cam4",
+                    "url": "rtsp://admin:acciona-2024@192.168.0.46:554",
+                    "offset_tracking": 0,
+                    "models": ["yolov8n-pose.pt" ]
+                }
+            ],
+    "tracker_config": {
+        "last_global_track_id": 0,
+        "track_activation_threshold": 0.5,
+        "lost_track_buffer": 20,
+        "minimum_matching_threshold": 0.8,
+        "frame_rate": 35,
+        "minimum_consecutive_frames": 1,
+        "use_uuid7": true,
+        "use_tracking": true,
+        "tracked_classes": ["Persona", "Casco", "person"]
+    },
+    "use_queues": false
+}
