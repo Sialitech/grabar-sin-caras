@@ -4,7 +4,7 @@ services:
 
   # YOLO-API
   api-yolo:
-    image: siali/ia-safe:dev_2-58
+    image: siali/ia-safe:dev_2-63
     deploy:
       resources:
         reservations:
