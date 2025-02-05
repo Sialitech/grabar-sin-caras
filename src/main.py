@@ -164,6 +164,6 @@ class VideoRecorder:
             print("Proceso finalizado correctamente.")
 
 if __name__ == "__main__":
-    recorder = VideoRecorder(video_duration_minutes=1, fixed_fps=25)
+    recorder = VideoRecorder(video_duration_minutes=15, fixed_fps=25)
     recorder.record()
     print("Ejecución finalizada.")
