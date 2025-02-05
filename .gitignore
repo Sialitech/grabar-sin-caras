@@ -1,0 +1,4 @@
+files/
+models/
+src/pycache/
+models/yolov8m-pose.pt

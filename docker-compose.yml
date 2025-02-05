@@ -4,14 +4,14 @@ services:
 
   # YOLO-API
   api-yolo:
-    image: siali/ia-safe:dev_2-63
+    image: siali/ia-safe:dev_2-58
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu, compute, utility]
+              capabilities: [gpu]
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost:3002/check_status"]
     #   interval: 30s
@@ -25,7 +25,7 @@ services:
     environment:
       - LOGLEVEL=debug
       - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
     volumes:
       - ./cfgs/:/cfgs/
       - ./files/:/files/

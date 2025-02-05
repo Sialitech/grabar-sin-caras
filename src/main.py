@@ -73,7 +73,7 @@ class VideoRecorder:
                         print(f"{camera_name}: Tiempo límite alcanzado ({elapsed_time:.2f}s). Deteniendo grabación.")
                         break
 
-                    for chunk in response.iter_content(chunk_size=16384):
+                    for chunk in response.iter_content(chunk_size=1048576):
                         if self.stop_event.is_set():
                             break
                         
@@ -164,6 +164,6 @@ class VideoRecorder:
             print("Proceso finalizado correctamente.")
 
 if __name__ == "__main__":
-    recorder = VideoRecorder(video_duration_minutes=0.5, fixed_fps=25)
+    recorder = VideoRecorder(video_duration_minutes=1, fixed_fps=25)
     recorder.record()
     print("Ejecución finalizada.")
